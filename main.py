@@ -57,10 +57,10 @@ def knapsack_brute(C, w, v, n):
 # Tworzenie / wczytywanie danych / określenie parametrów #
 ##########################################################
 datasets_number = 4
-base = 2
+base = 10
 KNAPSACK_CAPACITY_MODIFIER = [0.2, 0.35, 0.5]
-max_weight = 30
-max_value = 30
+max_weight = 100
+max_value = 100
 datasets = []
 knapsack_capacities = []
 problem_names = []
