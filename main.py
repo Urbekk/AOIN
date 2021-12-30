@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 from random import sample, randint
 from tabulate import tabulate
 import time
+import random
+import bee
+
+random.seed(10)
 
 
 def generate_data(amount, max_weight, max_value):
@@ -69,6 +73,7 @@ for number in range(1, datasets_number + 1):
         tmp_cap.append(np.round(np.sum(datasets[number-1][:, 1]) * x))
     knapsack_capacities.append(tmp_cap)
 
+print(datasets[1].T)
 #####################################
 # Pomiar czasu działania algorytmów #
 #####################################
