@@ -123,13 +123,14 @@ class Hive:
             self.employed_bee_phase()
             self.onlooker_bee_phase()
             self.scout_bee_phase(limit)
-            print("BEST SO FAR:",self.best_function_value)
-
+            # print("BEST SO FAR:",self.best_function_value)
+        print("Hello from bee")
         # print(data.T)
-        print("Best food source")
-        print(f" {self.best_food_source}")
-        print(f"with highest value in backpack: {self.best_function_value}")
-        print(f"with weight: {self.weight}")
+        # print("Best food source")
+        # print(f" {self.best_food_source}")
+        # print(f"with highest value in backpack: {self.best_function_value}")
+        # print(f"with weight: {self.weight}")
+        return self.best_function_value, np.count_nonzero(self.best_food_source)
 
 
 def generate_data(amount, max_weight, max_value):
@@ -152,4 +153,5 @@ if __name__ == "__main__":
     # print(data.T)
 
     ABC = Hive(swarm_size=swarm_size, data=data, capacity=capacity)
-    ABC.run(number_of_cycles=100, limit=10)
+    print(ABC.run(number_of_cycles=100, limit=10))
+

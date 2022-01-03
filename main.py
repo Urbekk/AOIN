@@ -3,11 +3,8 @@ import matplotlib.pyplot as plt
 from random import sample, randint
 from tabulate import tabulate
 import time
-import random
 import bee
-
-random.seed(10)
-
+import genetic
 
 def generate_data(amount, max_weight, max_value):
     random_weights = [randint(1, max_weight) for i in range(amount)]  # sample(range(1, max_weight), amount)
@@ -59,8 +56,8 @@ def knapsack_brute(C, w, v, n):
 datasets_number = 4
 base = 4
 KNAPSACK_CAPACITY_MODIFIER = [0.2, 0.35, 0.5]
-max_weight = 100
-max_value = 100
+max_weight = 30
+max_value = 30
 datasets = []
 knapsack_capacities = []
 problem_names = []
@@ -73,37 +70,70 @@ for number in range(1, datasets_number + 1):
         tmp_cap.append(np.round(np.sum(datasets[number-1][:, 1]) * x))
     knapsack_capacities.append(tmp_cap)
 
-print(datasets[1].T)
 #####################################
 # Pomiar czasu działania algorytmów #
 #####################################
-times_ref = []
+# Zwykły
+times = []
 summary_values = []
+knapsacks_item_number = []
+# Parametry
+swarm_size = 100
+number_of_cycles = 100
+limit = 10
+
+# Referencyjny
+times_ref = []
+summary_values_ref = []
 knapsacks_item_number_ref = []
+
 for number in range(datasets_number):
+    # Zwykły
     tmp_value = []
     tmp_time = []
     tmp_number = []
+
+    # Referencyjny
+    tmp_value_ref = []
+    tmp_time_ref = []
+    tmp_number_ref = []
+
     for cap in knapsack_capacities[number]:
+        # Zwykly
         start = time.time()
-        opt_val, number_of_items = knapsack_greedy(cap, datasets[number])
-        # for graph test
-        # opt_val = knapsack_brute(cap, datasets[number][:,1], datasets[number][:,2], len(datasets[number][:,0]))
+        ABC = bee.Hive(swarm_size=swarm_size, data=datasets[number], capacity=cap)
+        opt_val, number_of_items = ABC.run(number_of_cycles=number_of_cycles, limit=limit)
         end = time.time()
+
         tmp_value.append(opt_val)
         tmp_time.append(end - start)
         tmp_number.append(number_of_items)
+
+        # Referencyjny
+        print("check")
+        start = time.time()
+        opt_val_ref, number_of_items_ref = genetic.run(max_weight=cap, values=datasets[number][:, 2], weights=datasets[number][:, 1])
+        end = time.time()
+
+        tmp_value_ref.append(opt_val_ref)
+        tmp_number_ref.append(number_of_items_ref)
+        tmp_time_ref.append(end - start)
+
+    # Zwykły
     summary_values.append(tmp_value)
-    times_ref.append(tmp_time)
-    knapsacks_item_number_ref.append(tmp_number)
+    times.append(tmp_time)
+    knapsacks_item_number.append(tmp_number)
 
-# print("@@@@@@@@@@@@@@@@")
-# print([time[0] for time in times_ref])
-# print("@@@@@@@@@@@@@@@@")
+    # Referencyjny
+    summary_values_ref.append(tmp_value_ref)
+    times_ref.append(tmp_time_ref)
+    knapsacks_item_number_ref.append(tmp_number_ref)
 
-# print([data[0] for data in datasets])
+plt.plot([len(data) for data in datasets], [time[0] for time in times], 'k--', linewidth=1.0)
+plt.plot([len(data) for data in datasets], [time[1] for time in times], 'b--', linewidth=1.0)
+plt.plot([len(data) for data in datasets], [time[2] for time in times], 'r--', linewidth=1.0)
 
-plt.plot([len(data) for data in datasets], [time[0] for time in times_ref], 'k--', linewidth=1.0)
+plt.plot([len(data) for data in datasets], [time[0] for time in times_ref], 'k', linewidth=1.0)
 plt.plot([len(data) for data in datasets], [time[1] for time in times_ref], 'b', linewidth=1.0)
 plt.plot([len(data) for data in datasets], [time[2] for time in times_ref], 'r', linewidth=1.0)
 
@@ -115,28 +145,24 @@ plt.legend(['20% wagi', '35% wagi', '50% wagi'])
 plt.savefig('fig.png')
 
 
-# TMP to compare 2 algorithms, we dont have the second one right now
-knapsacks_item_number_not_ref = knapsacks_item_number_ref
-summary_values_not_ref = summary_values
-
 result = []
 result20 = []
 result35 = []
 result50 = []
 for i in range(len(problem_names)):
     result.append([problem_names[i]
-                   , knapsacks_item_number_ref[i][0], summary_values[i][0]
-                   , knapsacks_item_number_ref[i][1], summary_values[i][1]
-                   , knapsacks_item_number_ref[i][2], summary_values[i][2]])
+                   , knapsacks_item_number[i][0], summary_values[i][0]
+                   , knapsacks_item_number[i][1], summary_values[i][1]
+                   , knapsacks_item_number[i][2], summary_values[i][2]])
     result20.append([problem_names[i]
-                   , knapsacks_item_number_ref[i][0], summary_values[i][0]
-                   , knapsacks_item_number_not_ref[i][0], summary_values_not_ref[i][0]])
+                   , knapsacks_item_number[i][0], summary_values[i][0]
+                   , knapsacks_item_number_ref[i][0], summary_values_ref[i][0]])
     result35.append([problem_names[i]
-                   , knapsacks_item_number_ref[i][1], summary_values[i][1]
-                   , knapsacks_item_number_not_ref[i][1], summary_values_not_ref[i][1]])
+                   , knapsacks_item_number[i][1], summary_values[i][1]
+                   , knapsacks_item_number_ref[i][1], summary_values_ref[i][1]])
     result50.append([problem_names[i]
-                   , knapsacks_item_number_ref[i][2], summary_values[i][2]
-                   , knapsacks_item_number_not_ref[i][2], summary_values_not_ref[i][2]])
+                   , knapsacks_item_number[i][2], summary_values[i][2]
+                   , knapsacks_item_number_ref[i][2], summary_values_ref[i][2]])
 
 print("* Knapsack greedy algorithm result for diff capacities *")
 print(tabulate([["Problem name", "No. Items 20%", "Sum Profits 20%",
