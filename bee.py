@@ -38,7 +38,7 @@ class Bee:
             self.fitness = 1 + abs(self.function_value)
 
     def calcutale_probability(self, all_probabilities):
-        self.probability = self.fitness / all_probabilities
+        self.probability = self.function_value / all_probabilities
 
 
 class Hive:
@@ -80,9 +80,9 @@ class Hive:
         # print("debug")
 
     def onlooker_bee_phase(self):
-        fitness_sum = sum([bee.fitness for bee in self._hive])
+        function_value_sum = sum([bee.function_value for bee in self._hive])
         for bee in self._hive:
-            bee.calcutale_probability(fitness_sum)
+            bee.calcutale_probability(function_value_sum)
 
         number_of_onlooker_bees = int(self._swarm_size / 2)
         while number_of_onlooker_bees > 0:
