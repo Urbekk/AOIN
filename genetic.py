@@ -153,10 +153,10 @@ def run(max_weight, values, weights):
             cur_val += values[i]
             cur_weight += weights[i]
 
-    print("Solution found in {} generations".format(generations))
-    print("Selection is: ", solution_arr)
-    print("Total values is: ", cur_val)
-    print("Total weight is: ", cur_weight)
+    # print("Solution found in {} generations".format(generations))
+    # print("Selection is: ", solution_arr)
+    # print("Total values is: ", cur_val)
+    # print("Total weight is: ", cur_weight)
 
     return cur_weight, np.count_nonzero(solution_arr)
 

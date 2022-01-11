@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 from random import sample, randint
@@ -54,17 +55,19 @@ def knapsack_brute(C, w, v, n):
 # Tworzenie / wczytywanie danych / określenie parametrów #
 ##########################################################
 datasets_number = 4
-base = 4
+base = 3
 KNAPSACK_CAPACITY_MODIFIER = [0.2, 0.35, 0.5]
-max_weight = 30
-max_value = 30
+max_weight = 50
+max_value = 50
 datasets = []
 knapsack_capacities = []
 problem_names = []
 
+# random.seed(241525)
+
 for number in range(1, datasets_number + 1):
-    problem_names.append(f"Rand {pow(base, number)}")
-    datasets.append(generate_data(pow(base, number), max_weight, max_value))
+    problem_names.append(f"Rand {pow(base, number+1)}")
+    datasets.append(generate_data(pow(base, number+1), max_weight, max_value))
     tmp_cap = []
     for x in KNAPSACK_CAPACITY_MODIFIER:
         tmp_cap.append(np.round(np.sum(datasets[number-1][:, 1]) * x))
@@ -112,7 +115,7 @@ for number in range(datasets_number):
         # Referencyjny
         print("check")
         start = time.time()
-        opt_val_ref, number_of_items_ref = genetic.run(max_weight=cap, values=datasets[number][:, 2], weights=datasets[number][:, 1])
+        opt_val_ref, number_of_items_ref = knapsack_greedy(cap, datasets[number])
         end = time.time()
 
         tmp_value_ref.append(opt_val_ref)
@@ -164,7 +167,7 @@ for i in range(len(problem_names)):
                    , knapsacks_item_number[i][2], summary_values[i][2]
                    , knapsacks_item_number_ref[i][2], summary_values_ref[i][2]])
 
-print("* Knapsack greedy algorithm result for diff capacities *")
+print("* Knapsack bee algorithm result for diff capacities *")
 print(tabulate([["Problem name", "No. Items 20%", "Sum Profits 20%",
                  "No. Items 35%", "Sum Profits 35%", "No. Items 50%", "Sum Profits 50%"]]
                + result, headers='firstrow', tablefmt='fancy_grid'))
@@ -180,3 +183,6 @@ print(tabulate([["Problem name", "No. Items", "Sum Profits",
 print("* Algorithm comparison for capacity 50% *")
 print(tabulate([["Problem name", "No. Items", "Sum Profits",
                  "No. Items", "Sum Profits"]] + result50, headers='firstrow', tablefmt='fancy_grid'))
+
+print(np.sum(times))
+print(np.sum(times_ref))

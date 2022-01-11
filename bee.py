@@ -58,6 +58,8 @@ class Hive:
         self._hive = [Bee() for i in range(round(swarm_size / 2))]
         self.weight = 0
 
+        # self.greed = self.init_greed_solution(self._data,self._capacity)
+
         for bee in self._hive:
             bee.set_random_solution(self._data, self._capacity, self._item_ranking)
             bee.calculate_function_value(self._data)
@@ -132,6 +134,25 @@ class Hive:
         # print(f"with weight: {self.weight}")
         return self.best_function_value, np.count_nonzero(self.best_food_source)
 
+    def init_greed_solution(self, data, C):
+        score = data[:, 2] / data[:, 1]
+        data = np.concatenate((data, score[:, np.newaxis]), axis=1)
+        data = data[data[:, 3].argsort()][::-1]
+        lim = np.shape(data)[0]
+        i = 0
+        backpack = []
+        while i < lim:
+            if data[i, 1] <= C:
+                C = C - data[i, 1]
+                backpack.append(data[i, :])
+                i = i + 1
+            else:
+                i = i + 1
+        np_b = np.array(backpack)
+        food_source = np.linspace(0,0,lim)
+        for i in range(lim):
+            food_source[int(np_b[i,0])]=1
+        return food_source
 
 def generate_data(amount, max_weight, max_value):
     random_weights = [random.randint(1, max_weight) for i in range(amount)]  # sample(range(1, max_weight), amount)
