@@ -117,6 +117,9 @@ class Hive:
         for bee in self._hive:
             if bee.trial > limit:
                 bee.set_random_solution(self._data, self._capacity, self._item_ranking)
+                # bee.solution = self._greed
+                bee.dopchaj_solution(self._data, self._capacity, self._item_ranking)
+
                 bee.calculate_function_value(self._data)
                 bee.calculate_fitness()
 
