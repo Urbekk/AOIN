@@ -2,6 +2,8 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from random import sample, randint
+
+from ortools.algorithms import pywrapknapsack_solver
 from tabulate import tabulate
 import time
 import bee
@@ -54,20 +56,21 @@ def knapsack_brute(C, w, v, n):
 ##########################################################
 # Tworzenie / wczytywanie danych / określenie parametrów #
 ##########################################################
-datasets_number = 4
-base = 3
+datasets_number = 3
+base = 10
 KNAPSACK_CAPACITY_MODIFIER = [0.2, 0.35, 0.5]
-max_weight = 50
-max_value = 50
+max_weight = 100
+max_value = 100
 datasets = []
 knapsack_capacities = []
 problem_names = []
 
 # random.seed(241525)
 
+
 for number in range(1, datasets_number + 1):
-    problem_names.append(f"Rand {pow(base, number+1)}")
-    datasets.append(generate_data(pow(base, number+1), max_weight, max_value))
+    problem_names.append(f"Rand {pow(base, number)}")
+    datasets.append(generate_data(pow(base, number), max_weight, max_value))
     tmp_cap = []
     for x in KNAPSACK_CAPACITY_MODIFIER:
         tmp_cap.append(np.round(np.sum(datasets[number-1][:, 1]) * x))
@@ -81,9 +84,9 @@ times = []
 summary_values = []
 knapsacks_item_number = []
 # Parametry
-swarm_size = 100
+swarm_size = 1000
 number_of_cycles = 100
-limit = 10
+limit = 30
 
 # Referencyjny
 times_ref = []
@@ -121,6 +124,17 @@ for number in range(datasets_number):
         tmp_value_ref.append(opt_val_ref)
         tmp_number_ref.append(number_of_items_ref)
         tmp_time_ref.append(end - start)
+        l = datasets[number]
+        values = [value for value in l[:, 2]]
+        weights = [weight for weight in l[:, 1]]
+        weights = [weights]
+        capacities = [cap]
+        solver = pywrapknapsack_solver.KnapsackSolver(
+            pywrapknapsack_solver.KnapsackSolver.
+                KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER, 'KnapsackExample')
+        solver.Init(values, weights, capacities)
+        computed_value = solver.Solve()
+        print(computed_value)
 
     # Zwykły
     summary_values.append(tmp_value)
